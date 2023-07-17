@@ -1,0 +1,18 @@
+{
+    "sunbytes_item": {
+        "column": {
+            "item_id": true,
+            "title": true,
+            "content": true,
+            "creation_time": true,
+            "update_time": true,
+            "is_active": true
+        },
+        "index": {
+            "SUNBYTES_ITEM_TITLE_CONTENT": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

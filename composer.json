@@ -1,0 +1,17 @@
+{
+    "name": "kruzhalin/sunbytes",
+    "version": "1.0.0",
+    "description": "Assignment for Magento Developer position",
+    "type": "magento2-module",
+    "license": [
+        "Proprietary"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Kruzhalin\\Sunbytes\\": ""
+        }
+    }
+}

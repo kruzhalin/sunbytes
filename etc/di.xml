@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Kruzhalin\Sunbytes\Api\Data\ItemInterface" type="Kruzhalin\Sunbytes\Model\Item" />
+    <preference for="Kruzhalin\Sunbytes\Api\ItemRepositoryInterface" type="Kruzhalin\Sunbytes\Model\ItemRepository" />
+    <preference for="Kruzhalin\Sunbytes\Api\Data\ItemSearchResultsInterface" type="Kruzhalin\Sunbytes\Model\ItemSearchResults" />
+</config>
