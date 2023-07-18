@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:extention:Magento_Widget:etc/widget.xsd">
+    <widget class="Kruzhalin\Sunbytes\Block\ItemWidget" id="sunbytes_widget">
+        <label>Sunbytes Widget</label>
+        <description>Insert Sunbytes Item</description>
+        <parameters>
+            <parameter name="item_id" xsi:type="text" visible="true" required="true" sort_order="10">
+                <label translate="true">Item Id</label>
+                <description translate="true">Please insert Item id</description>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>
