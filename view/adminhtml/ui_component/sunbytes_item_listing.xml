@@ -32,7 +32,7 @@
             <updateUrl path="mui/index/render"/>
         </settings>
         <aclResource>Kruzhalin_Sunbytes::items</aclResource>
-        <dataProvider class="Kruzhalin\Sunbyte\Ui\Component\DataProvider" name="sunbytes_item_listing_data_source">
+        <dataProvider class="Kruzhalin\Sunbytes\Ui\Component\DataProvider" name="sunbytes_item_listing_data_source">
             <settings>
                 <requestFieldName>id</requestFieldName>
                 <primaryFieldName>item_id</primaryFieldName>
@@ -61,11 +61,6 @@
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="sunbytes_item_columns">
-        <selectionsColumn name="ids">
-            <settings>
-                <indexField>item_id</indexField>
-            </settings>
-        </selectionsColumn>
         <column name="item_id">
             <settings>
                 <filter>textRange</filter>
@@ -110,15 +105,13 @@
                 <label translate="true">Modified</label>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Magento\Theme\Ui\Component\Listing\Column\EditAction">
+        <actionsColumn name="actions" class="Kruzhalin\Sunbytes\Ui\Component\Listing\Column\Actions">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="editUrlPath" xsi:type="string">sunbytes/items/edit</item>
+                    <item name="viewUrlPath" xsi:type="string">sunbytes/item/edit</item>
+                    <item name="urlEntityParamName" xsi:type="string">item_id</item>
                 </item>
             </argument>
-            <settings>
-                <indexField>item_id</indexField>
-            </settings>
         </actionsColumn>
     </columns>
 </listing>

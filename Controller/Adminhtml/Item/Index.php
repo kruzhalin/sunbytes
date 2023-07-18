@@ -5,9 +5,12 @@
  */
 declare(strict_types=1);
 
-namespace Kruzhalin\Sunbyte\Controller\Adminhtml\Block;
+namespace Kruzhalin\Sunbytes\Controller\Adminhtml\Item;
 
+use Magento\Backend\Model\View\Result\Page;
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\View\Result\PageFactory;
 
 /**
  * Index action.
@@ -17,15 +20,15 @@ class Index implements HttpGetActionInterface
     const ADMIN_RESOURCE = 'Kruzhalin_Sunbytes::items';
 
     /**
-     * @var \Magento\Framework\View\Result\PageFactory
+     * @var PageFactory
      */
     protected $resultPageFactory;
 
     /**
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param PageFactory $resultPageFactory
      */
     public function __construct(
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        PageFactory $resultPageFactory
     ) {
         $this->resultPageFactory = $resultPageFactory;
     }
@@ -33,11 +36,11 @@ class Index implements HttpGetActionInterface
     /**
      * Index action
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
-        /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
+        /** @var Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
 
         return $resultPage;

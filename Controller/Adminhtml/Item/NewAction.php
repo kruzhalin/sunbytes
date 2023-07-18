@@ -3,42 +3,45 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-namespace Magento\Cms\Controller\Adminhtml\Block;
+declare(strict_types=1);
 
+namespace Kruzhalin\Sunbytes\Controller\Adminhtml\Item;
+
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\ForwardFactory;
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\Controller\Result\Forward;
+use Magento\Framework\Controller\ResultInterface;
 
 /**
  * Create CMS block action.
  */
-class NewAction extends \Magento\Cms\Controller\Adminhtml\Block implements HttpGetActionInterface
+class NewAction implements HttpGetActionInterface
 {
     /**
-     * @var \Magento\Backend\Model\View\Result\ForwardFactory
+     * @var ForwardFactory
      */
-    protected $resultForwardFactory;
+    protected ForwardFactory $resultForwardFactory;
 
     /**
-     * @param \Magento\Backend\App\Action\Context $context
+     * @param Context $context
      * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
+     * @param ForwardFactory $resultForwardFactory
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
+        ForwardFactory $resultForwardFactory
     ) {
         $this->resultForwardFactory = $resultForwardFactory;
-        parent::__construct($context, $coreRegistry);
     }
 
     /**
-     * Create new CMS block
+     * Create new item
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
-        /** @var \Magento\Framework\Controller\Result\Forward $resultForward */
+        /** @var Forward $resultForward */
         $resultForward = $this->resultForwardFactory->create();
         return $resultForward->forward('edit');
     }

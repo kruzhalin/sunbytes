@@ -4,4 +4,12 @@
     <preference for="Kruzhalin\Sunbytes\Api\Data\ItemInterface" type="Kruzhalin\Sunbytes\Model\Item" />
     <preference for="Kruzhalin\Sunbytes\Api\ItemRepositoryInterface" type="Kruzhalin\Sunbytes\Model\ItemRepository" />
     <preference for="Kruzhalin\Sunbytes\Api\Data\ItemSearchResultsInterface" type="Kruzhalin\Sunbytes\Model\ItemSearchResults" />
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="sunbytes_item_listing_data_source" xsi:type="string">Kruzhalin\Sunbytes\Model\ResourceModel\Item\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

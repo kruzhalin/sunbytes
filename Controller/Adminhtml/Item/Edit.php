@@ -3,68 +3,98 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-namespace Magento\Cms\Controller\Adminhtml\Block;
+declare(strict_types=1);
 
+namespace Kruzhalin\Sunbytes\Controller\Adminhtml\Item;
+
+use Kruzhalin\Sunbytes\Model\ItemRepository;
+use Magento\Backend\Model\View\Result\Page;
+use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Message\ManagerInterface as MessageManagerInterface;
+use Magento\Framework\View\Result\PageFactory;
 
 /**
- * Edit CMS block action.
+ * Edit item action.
  */
-class Edit extends \Magento\Cms\Controller\Adminhtml\Block implements HttpGetActionInterface
+class Edit implements HttpGetActionInterface
 {
     /**
-     * @var \Magento\Framework\View\Result\PageFactory
+     * @var MessageManagerInterface
      */
-    protected $resultPageFactory;
+    protected MessageManagerInterface $messageManager;
+    /**
+     * @var PageFactory
+     */
+    protected PageFactory $resultPageFactory;
 
     /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @var RedirectFactory
+     */
+    protected RedirectFactory $resultRedirectFactory;
+
+    /**
+     * @var RequestInterface
+     */
+    protected RequestInterface $request;
+
+    /**
+     * @var ItemRepository
+     */
+    protected ItemRepository $itemRepository;
+
+    /**
+     * @param PageFactory $resultPageFactory
+     * @param ItemRepository $itemRepository
+     * @param MessageManagerInterface $messageManager
+     * @param RedirectFactory $redirectFactory
+     * @param RequestInterface $request
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        PageFactory             $resultPageFactory,
+        ItemRepository          $itemRepository,
+        MessageManagerInterface $messageManager,
+        RedirectFactory         $redirectFactory,
+        RequestInterface        $request
     ) {
+        $this->itemRepository = $itemRepository;
+        $this->messageManager = $messageManager;
         $this->resultPageFactory = $resultPageFactory;
-        parent::__construct($context, $coreRegistry);
+        $this->resultRedirectFactory = $redirectFactory;
+        $this->request = $request;
     }
 
     /**
-     * Edit CMS block
+     * Edit item
      *
-     * @return \Magento\Framework\Controller\ResultInterface
-     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @return ResultInterface
      */
     public function execute()
     {
-        // 1. Get ID and create model
-        $id = $this->getRequest()->getParam('block_id');
-        $model = $this->_objectManager->create(\Magento\Cms\Model\Block::class);
-
-        // 2. Initial checking
+        $id = $this->request->getParam('item_id');
+        $model = null;
         if ($id) {
-            $model->load($id);
+            $model = $this->itemRepository->getById((int)$id);
             if (!$model->getId()) {
-                $this->messageManager->addErrorMessage(__('This block no longer exists.'));
-                /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+                $this->messageManager->addErrorMessage(__('This item no longer exists.'));
+                /** @var Redirect $resultRedirect */
                 $resultRedirect = $this->resultRedirectFactory->create();
                 return $resultRedirect->setPath('*/*/');
             }
         }
 
-        $this->_coreRegistry->register('cms_block', $model);
-
-        // 5. Build edit form
-        /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
+        /** @var Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
-        $this->initPage($resultPage)->addBreadcrumb(
-            $id ? __('Edit Block') : __('New Block'),
-            $id ? __('Edit Block') : __('New Block')
-        );
-        $resultPage->getConfig()->getTitle()->prepend(__('Blocks'));
-        $resultPage->getConfig()->getTitle()->prepend($model->getId() ? $model->getTitle() : __('New Block'));
+
+        $resultPage->getConfig()->getTitle()->prepend(__('Items'));
+        $title = __('New Item');
+        if ($model !== null) {
+            $title = $model->getTitle();
+        }
+        $resultPage->getConfig()->getTitle()->prepend($title);
         return $resultPage;
     }
 }

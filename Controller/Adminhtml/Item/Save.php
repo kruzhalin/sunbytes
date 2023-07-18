@@ -3,87 +3,100 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-namespace Magento\Cms\Controller\Adminhtml\Block;
+declare(strict_types=1);
 
+namespace Kruzhalin\Sunbytes\Controller\Adminhtml\Item;
+
+use Kruzhalin\Sunbytes\Api\Data\ItemInterface;
+use Kruzhalin\Sunbytes\Model\ItemRepository;
+use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Backend\App\Action\Context;
-use Magento\Cms\Api\BlockRepositoryInterface;
-use Magento\Cms\Model\Block;
-use Magento\Cms\Model\BlockFactory;
-use Magento\Framework\App\Request\DataPersistorInterface;
+use Kruzhalin\Sunbytes\Api\ItemRepositoryInterface;
+use Kruzhalin\Sunbytes\Model\Item;
+use Kruzhalin\Sunbytes\Model\ItemFactory;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Registry;
+use Magento\Framework\Message\ManagerInterface as MessageManagerInterface;
 
 /**
- * Save CMS block action.
+ * Save CMS item action.
  */
-class Save extends \Magento\Cms\Controller\Adminhtml\Block implements HttpPostActionInterface
+class Save implements HttpPostActionInterface
 {
     /**
-     * @var DataPersistorInterface
+     * @var MessageManagerInterface
      */
-    protected $dataPersistor;
+    protected MessageManagerInterface $messageManager;
 
     /**
-     * @var BlockFactory
+     * @var ItemFactory
      */
-    private $blockFactory;
+    private ItemFactory $itemFactory;
 
     /**
-     * @var BlockRepositoryInterface
+     * @var RedirectFactory
      */
-    private $blockRepository;
+    protected RedirectFactory $resultRedirectFactory;
 
     /**
-     * @param Context $context
-     * @param Registry $coreRegistry
-     * @param DataPersistorInterface $dataPersistor
-     * @param BlockFactory|null $blockFactory
-     * @param BlockRepositoryInterface|null $blockRepository
+     * @var RequestInterface
+     */
+    protected RequestInterface $request;
+
+    /**
+     * @var ItemRepository
+     */
+    protected ItemRepository $itemRepository;
+
+    /**
+     * @param MessageManagerInterface $messageManager
+     * @param ItemFactory $itemFactory
+     * @param ItemRepositoryInterface $itemRepository
+     * @param RedirectFactory $resultRedirectFactory
+     * @param RequestInterface $request
      */
     public function __construct(
-        Context $context,
-        Registry $coreRegistry,
-        DataPersistorInterface $dataPersistor,
-        BlockFactory $blockFactory = null,
-        BlockRepositoryInterface $blockRepository = null
+        MessageManagerInterface $messageManager,
+        ItemFactory             $itemFactory,
+        ItemRepositoryInterface $itemRepository,
+        RedirectFactory         $resultRedirectFactory,
+        RequestInterface        $request
     ) {
-        $this->dataPersistor = $dataPersistor;
-        $this->blockFactory = $blockFactory
-            ?: \Magento\Framework\App\ObjectManager::getInstance()->get(BlockFactory::class);
-        $this->blockRepository = $blockRepository
-            ?: \Magento\Framework\App\ObjectManager::getInstance()->get(BlockRepositoryInterface::class);
-        parent::__construct($context, $coreRegistry);
+        $this->messageManager = $messageManager;
+        $this->itemFactory = $itemFactory;
+        $this->itemRepository = $itemRepository;
+        $this->resultRedirectFactory = $resultRedirectFactory;
+        $this->request = $request;
     }
 
     /**
      * Save action
      *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
-        /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+        /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        $data = $this->getRequest()->getPostValue();
+        $data = $this->request->getPostValue();
         if ($data) {
             if (isset($data['is_active']) && $data['is_active'] === 'true') {
-                $data['is_active'] = Block::STATUS_ENABLED;
+                $data['is_active'] = ItemInterface::STATUS_ENABLED;
             }
-            if (empty($data['block_id'])) {
-                $data['block_id'] = null;
+            if (empty($data['item_id'])) {
+                $data['item_id'] = null;
             }
 
-            /** @var \Magento\Cms\Model\Block $model */
-            $model = $this->blockFactory->create();
+            $model = $this->itemFactory->create();
 
-            $id = $this->getRequest()->getParam('block_id');
+            $id = $this->request->getParam('item_id');
             if ($id) {
                 try {
-                    $model = $this->blockRepository->getById($id);
+                    $model = $this->itemRepository->getById((int)$id);
                 } catch (LocalizedException $e) {
-                    $this->messageManager->addErrorMessage(__('This block no longer exists.'));
+                    $this->messageManager->addErrorMessage(__('This item no longer exists.'));
                     return $resultRedirect->setPath('*/*/');
                 }
             }
@@ -91,48 +104,37 @@ class Save extends \Magento\Cms\Controller\Adminhtml\Block implements HttpPostAc
             $model->setData($data);
 
             try {
-                $this->blockRepository->save($model);
-                $this->messageManager->addSuccessMessage(__('You saved the block.'));
-                $this->dataPersistor->clear('cms_block');
+                $this->itemRepository->save($model);
+                $this->messageManager->addSuccessMessage(__('You saved the item.'));
                 return $this->processBlockReturn($model, $data, $resultRedirect);
             } catch (LocalizedException $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());
             } catch (\Exception $e) {
-                $this->messageManager->addExceptionMessage($e, __('Something went wrong while saving the block.'));
+                $this->messageManager->addExceptionMessage($e, __('Something went wrong while saving the item.'));
             }
 
-            $this->dataPersistor->set('cms_block', $data);
-            return $resultRedirect->setPath('*/*/edit', ['block_id' => $id]);
+            return $resultRedirect->setPath('*/*/edit', ['item_id' => $id]);
         }
         return $resultRedirect->setPath('*/*/');
     }
 
     /**
-     * Process and set the block return
+     * Process and set the item return
      *
-     * @param \Magento\Cms\Model\Block $model
+     * @param Item $model
      * @param array $data
-     * @param \Magento\Framework\Controller\ResultInterface $resultRedirect
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @param ResultInterface $resultRedirect
+     * @return ResultInterface
+     * @throws LocalizedException
      */
-    private function processBlockReturn($model, $data, $resultRedirect)
+    private function processBlockReturn($model, $data, $resultRedirect): ResultInterface
     {
         $redirect = $data['back'] ?? 'close';
 
-        if ($redirect ==='continue') {
-            $resultRedirect->setPath('*/*/edit', ['block_id' => $model->getId()]);
+        if ($redirect === 'continue') {
+            $resultRedirect->setPath('*/*/edit', ['item_id' => $model->getId()]);
         } elseif ($redirect === 'close') {
             $resultRedirect->setPath('*/*/');
-        } elseif ($redirect === 'duplicate') {
-            $duplicateModel = $this->blockFactory->create(['data' => $data]);
-            $duplicateModel->setId(null);
-            $duplicateModel->setIdentifier($data['identifier'] . '-' . uniqid());
-            $duplicateModel->setIsActive(Block::STATUS_DISABLED);
-            $this->blockRepository->save($duplicateModel);
-            $id = $duplicateModel->getId();
-            $this->messageManager->addSuccessMessage(__('You duplicated the block.'));
-            $this->dataPersistor->set('cms_block', $data);
-            $resultRedirect->setPath('*/*/edit', ['block_id' => $id]);
         }
         return $resultRedirect;
     }

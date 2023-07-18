@@ -6,43 +6,78 @@
  */
 declare(strict_types=1);
 
-namespace Magento\Cms\Controller\Adminhtml\Block;
+namespace Kruzhalin\Sunbytes\Controller\Adminhtml\Item;
 
+use Kruzhalin\Sunbytes\Model\ItemRepository;
+use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Message\ManagerInterface as MessageManagerInterface;
 
 class Delete implements HttpPostActionInterface
 {
+
+    /**
+     * @var MessageManagerInterface
+     */
+    protected MessageManagerInterface $messageManager;
+
+    /**
+     * @var RedirectFactory
+     */
+    protected RedirectFactory $resultRedirectFactory;
+
+    /**
+     * @var RequestInterface
+     */
+    protected RequestInterface $request;
+
+    /**
+     * @var ItemRepository
+     */
+    protected ItemRepository $itemRepository;
+
+    /**
+     * @param ItemRepository $itemRepository
+     * @param MessageManagerInterface $messageManager
+     * @param RedirectFactory $redirectFactory
+     * @param RequestInterface $request
+     */
+    public function __construct(
+        ItemRepository          $itemRepository,
+        MessageManagerInterface $messageManager,
+        RedirectFactory         $redirectFactory,
+        RequestInterface        $request
+    ) {
+        $this->itemRepository = $itemRepository;
+        $this->messageManager = $messageManager;
+        $this->resultRedirectFactory = $redirectFactory;
+        $this->request = $request;
+    }
+
     /**
      * Delete action
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
-        /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+        /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        // check if we know what should be deleted
-        $id = $this->getRequest()->getParam('block_id');
+        $id = $this->request->getParam('item_id');
         if ($id) {
             try {
-                // init model and delete
-                $model = $this->_objectManager->create(\Kruzhalin\Sunbyte\Model\Block::class);
-                $model->load($id);
-                $model->delete();
-                // display success message
+                $this->itemRepository->deleteById($id);
                 $this->messageManager->addSuccessMessage(__('You deleted the item.'));
-                // go to grid
                 return $resultRedirect->setPath('*/*/');
             } catch (\Exception $e) {
-                // display error message
                 $this->messageManager->addErrorMessage($e->getMessage());
-                // go back to edit form
                 return $resultRedirect->setPath('*/*/edit', ['item_id' => $id]);
             }
         }
-        // display error message
         $this->messageManager->addErrorMessage(__('We can\'t find a item to delete.'));
-        // go to grid
         return $resultRedirect->setPath('*/*/');
     }
 }
