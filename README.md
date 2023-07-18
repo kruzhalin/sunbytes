@@ -17,4 +17,14 @@ composer config repositories.kruzhalin-magento-2-sunbytes git git@github.com:kru
 
 composer require kruzhalin/sunbytes:dev-master
 ```
-### Screenshot
+### Screenshots
+
+![Backend Menu](https://raw.githubusercontent.com/kruzhalin/sunbytes/master/Screenshot-1.png)
+
+![Item Grid](https://raw.githubusercontent.com/kruzhalin/sunbytes/master/Screenshot-2.png)
+
+![Item Form](https://raw.githubusercontent.com/kruzhalin/sunbytes/master/Screenshot-3.png)
+
+![API Endpoints](https://raw.githubusercontent.com/kruzhalin/sunbytes/master/Screenshot-4.png)
+
+![API Response](https://raw.githubusercontent.com/kruzhalin/sunbytes/master/Screenshot-5.png)

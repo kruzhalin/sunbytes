@@ -92,7 +92,7 @@
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
                 <dataType>text</dataType>
-                <label translate="true">Block Title</label>
+                <label translate="true">Item Title</label>
                 <dataScope>title</dataScope>
             </settings>
         </field>
@@ -103,7 +103,10 @@
                 </item>
             </argument>
             <settings>
-                <label/>
+                <label translate="true">Item Content</label>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
                 <dataScope>content</dataScope>
             </settings>
         </field>
